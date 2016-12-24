@@ -1,5 +1,9 @@
 "use strict";
 
+//basic setup
+const True = true;
+const False = false;
+
 function Stack(){
   this.stk = [];
   this.stk.length = 0;
@@ -23,7 +27,7 @@ function Stack(){
 function Calculator(display, max, spaces)  {
   this.screenDisplay = display;
   this.max = max;
-  this.value = '';
+  this.value = '0';
   this.spaces = spaces;
   this.startOver = true;
   this.stack = new Stack();
@@ -33,39 +37,38 @@ function Calculator(display, max, spaces)  {
     return this.tions[ope];
   };
   
-  this.tion = {
-    'add' : function(a, b){
-            this.startOver = true;
-            this.screenWrite(a + b);
+  this.tions = {
+    'plus' : function(a, b){
+            // this.startOver = true;
+            // this.screenWrite(a + b);
+            return a/1.0 + b/1.0;
             },
-    ''
-  };
+    'min' : function(a, b){
+              return a - b;
+            },
+    'times' : function(a, b){
+                return a*b;
+              },
   
-  this.add = function(a, b){
-    this.startOver = true;
-    this.screenWrite(a + b);
-  };
+    'div' : function(a, b){
+              return a/b;
+            },
   
-  this.sub = function(a, b){
-    return a - b;
-  };
-  
-  this.mul = function(a, b){
-    return a*b;
-  };
-  
-  this.div = function(a, b){
-    return a/b;
-  };
-  
-  this.mod = function(a, b){
-    return a%b;
+    'mod' : function(a, b){
+              return a%b;
+            },
   };
   
   this.solve = function(ope){
     if (this.value !== ''){
       if (ope === undefined) ope = this.op;
-      var ans = this.run(ope)(this.stack.pop(), this.value);
+      var ans = this.tions[ope];
+      ans = ans(this.stack.pop(), this.value);
+      console.log(ans);
+      this.startOver = true;
+      this.op = null;
+      this.screenWrite(ans);
+      this.stack.push(ans);
     }
   };
   
@@ -76,9 +79,6 @@ function Calculator(display, max, spaces)  {
     }
     else if (this.stack.size() === 2)
       this.solve();
-    // else if (this.value === ''){
-        
-    // }
     this.op = ope;
   };
   
@@ -86,14 +86,12 @@ function Calculator(display, max, spaces)  {
     
   };
   
-  this.screenWrite = function(val, change){
-    // var maxlength = 21;
-  
-    if (change) this.value = val;
+  this.screenWrite = function(val){
+    if (this.startOver) this.value = '' + val;
     else
-      this.value += val;
+      this.value += '' + val;
     if (this.value.length < this.max)
-      this.screenDisplay.innerHTML = /*makeSpaces((max - this.value.length)*2) + */this.value;
+      this.screenDisplay.innerHTML = this.value;
     
   };
   
@@ -103,11 +101,21 @@ function Calculator(display, max, spaces)  {
       res += " ";
     }
     return res;
-  }
+  };
 }
 
 window.onload = function(){
   var calc = new Calculator(document.getElementById('screen'), 20, 40);
+  
+  var reset = function(light){
+    for (var item in rations){
+      console.log(item);
+      rations[item].className = "tap tion";
+    }
+    if (light !== undefined)
+      light.className += " light";
+  };
+  
   var rands = [
       document.getElementById('zero'),
       document.getElementById('one'),
@@ -135,18 +143,25 @@ window.onload = function(){
     backspace : document.getElementById('back'),
     ans : document.getElementById('equ'),
   };
+  
+  sys.ans.onclick = function(){
+    calc.solve();
+    reset();
+  };
 
   for ( var i = 0; i < rands.length; i++ ) (function(i){ 
     rands[i].onclick = function() {
+      
+      calc.screenWrite(i);
       calc.startOver = false;
-      calc.screenWrite(i, false);
-      console.log(i);
     };
   })(i);
   
   for (var operation in rations) (function(i){
-    operation.onclick = function(){
-      calc.operate(i.id);
+    rations[operation].onclick = function(){
+      calc.operate(this.id);
+      calc.startOver = true;
+      reset(this);
     };
   })(i);
 

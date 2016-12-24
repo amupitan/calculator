@@ -41,7 +41,7 @@ a{
   background-color: #DEB887;
 }
 
-.tap:hover{
+.light, .tap:hover{
   border-color: #708090;
   background-color:#faebd7;
 }
