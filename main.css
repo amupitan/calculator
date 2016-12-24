@@ -60,4 +60,21 @@ a{
   font-size: 40px;
   margin-left: 120px;
   margin-right: 40px;
+  font-family: Georgia, serif;
+}
+
+#screen {
+  padding: 1px 0px;
+    text-rendering: auto;
+    color: initial;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: right;
+    margin: 0em 0em 0em 0em;
+    font: 43.3333px Arial;
+    margin-left: 80px;
 }
