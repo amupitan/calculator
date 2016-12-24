@@ -222,8 +222,8 @@ window.onload = function(){
 /*TODO
 **Screen lenth optimization
 **optimize to ES6
-**Add backspace
-**Add clear
+--Add backspace
+--Add clear
 **Add dot
 **Add sqr, sqrt, exp, log. ...
 **handle operations involving just '.' or '-'
