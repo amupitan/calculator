@@ -73,7 +73,7 @@ function Calculator(display, max)  {
       this.stack.push(parseInt(this.value));
       this.value = '';
     }
-    else if (this.stack.size() === 2)
+    else if (this.stack.size() === 1)
       this.solve();
     this.op = ope;
   };
