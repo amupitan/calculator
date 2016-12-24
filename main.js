@@ -22,12 +22,17 @@ function Stack(){
   this.peek = function(){
     return this.stk[this.size() - 1];
   };
+  
+  this.empty = function(){
+    this.stk.length = 0;
+  };
 }
 
 function Calculator(display, max)  {
   this.screenDisplay = display;
   this.max = max;
-  this.value = '0';
+  this.prev = '';
+  this.value = '&#8291;';
   this.startOver = true;
   this.stack = new Stack();
   this.op = null;
@@ -59,7 +64,7 @@ function Calculator(display, max)  {
   this.solve = function(ope){
     if (this.value !== '' && this.op !== null){
       if (ope === undefined) ope = this.op;
-      var ans = this.tions[ope](this.stack.pop(), this.value);
+      let ans = this.tions[ope](this.stack.pop(), this.value);
       console.log(ans);
       this.startOver = true;
       this.op = null;
@@ -69,20 +74,53 @@ function Calculator(display, max)  {
   };
   
   this.operate = function(ope){
+    if (this.value === '&#8291;') this.value = '0';
     if (this.op === null || this.value === ''){
       this.stack.push(parseInt(this.value));
+      this.prev = this.value;
       this.value = '';
+      console.log('ri');
     }
     else if (this.stack.size() === 1)
       this.solve();
     this.op = ope;
   };
   
+  this.clear = function(doubleClick=false){
+    this.prev = this.value;
+    this.value = '&#8291;';
+    this.screenWrite('&#8291;');
+    if (doubleClick){
+      this.op = null;
+      this.stack.empty();
+    }
+  };
+  
   this.backspace = function(){
-    
+    if (this.op !== null){
+      this.op = null;
+      this.stack.empty();
+      this.value = this.prev;
+      this.startOver = false;
+      return;
+    }
+    if (this.value !== '&#8291;'){
+      this.startOver = true;
+      let newStr = this.value.substring(0, this.value.length - 1);
+      if (newStr === '') newStr = '&#8291;';
+      this.screenWrite(newStr);
+      this.stack.empty();
+    }
   };
   
   this.screenWrite = function(val){
+    if (this.value === '&#8291;') this.value = '';
+    console.log(this.value);
+    if (val === '&#8291;') {
+      this.screenDisplay.innerHTML = '&#8291;';
+      this.value = '';
+      return;
+    }
     if (this.startOver) this.value = '' + val;
     else
       this.value += '' + val;
@@ -102,16 +140,18 @@ function Calculator(display, max)  {
 
 window.onload = function(){
   var calc = new Calculator(document.getElementById('screen'), 20);
-  var reset = function(light){
+  var reset = function(pressedKey){
     for (var item in rations){
-      console.log(item);
       rations[item].className = "tap tion";
     }
-    if (light !== undefined)
-      light.className += " light";
+    if (pressedKey !== undefined)
+      pressedKey.className += " light";
   };
-  
-  var rands = [
+  var rands;
+  try{
+    rands = [].slice.call(document.getElementsByClassName('rand')).reverse();
+  } catch(e){ /*For IE8 and below*/
+    rands = [
       document.getElementById('zero'),
       document.getElementById('one'),
       document.getElementById('two'),
@@ -123,9 +163,10 @@ window.onload = function(){
       document.getElementById('eight'),
       document.getElementById('nine')
     ];
-    
+  }
+  
   var rations = {
-      plus : document.getElementById('plus'),
+      'plus' : document.getElementById('plus'), //TODO use this to simplify code
       min : document.getElementById('min'),
       times : document.getElementById('times'),
       div : document.getElementById('div'),
@@ -135,19 +176,36 @@ window.onload = function(){
   
   
   var sys = {
-    backspace : document.getElementById('back'),
+    back : document.getElementById('back'),
     ans : document.getElementById('equ'),
+    clear : document.getElementById('clear'),
   };
   
   sys.ans.onclick = function(){
     calc.solve();
     reset();
   };
+  
+  sys.back.onclick = function(){
+    calc.backspace();
+    reset();
+  };
+  
+  sys.clear.onclick = function(){
+    calc.clear();
+  };
+  
+  sys.clear.ondblclick = function(){
+    calc.clear(true);
+    reset();
+  };
+  
 
   for ( var i = 0; i < rands.length; i++ ) (function(i){ 
     rands[i].onclick = function() {
       calc.screenWrite(i);
       calc.startOver = false;
+      
     };
   })(i);
   
@@ -161,20 +219,15 @@ window.onload = function(){
 
 };
 
-// this.screenWrite = function(val){
-//     // var maxlength = 21;
-    
-//     if (this.value.length < this.max){
-//       this.screenDisplay.value = this.value;//makeSpaces(max - this.value.length) + this.value;
-//       console.log('val len: ' + this.value.length + 'max: ' + this.max);
-//     }
-//     // this.screenDisplay.value += val;
-//     this.value += val;
-
-//   };
-
-
-
+/*TODO
+**Screen lenth optimization
+**optimize to ES6
+**Add backspace
+**Add clear
+**Add dot
+**Add sqr, sqrt, exp, log. ...
+**handle operations involving just '.' or '-'
+*/
 
 
 
