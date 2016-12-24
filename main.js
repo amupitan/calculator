@@ -24,11 +24,10 @@ function Stack(){
   };
 }
 
-function Calculator(display, max, spaces)  {
+function Calculator(display, max)  {
   this.screenDisplay = display;
   this.max = max;
   this.value = '0';
-  this.spaces = spaces;
   this.startOver = true;
   this.stack = new Stack();
   this.op = null;
@@ -39,8 +38,6 @@ function Calculator(display, max, spaces)  {
   
   this.tions = {
     'plus' : function(a, b){
-            // this.startOver = true;
-            // this.screenWrite(a + b);
             return a/1.0 + b/1.0;
             },
     'min' : function(a, b){
@@ -60,10 +57,9 @@ function Calculator(display, max, spaces)  {
   };
   
   this.solve = function(ope){
-    if (this.value !== ''){
+    if (this.value !== '' && this.op !== null){
       if (ope === undefined) ope = this.op;
-      var ans = this.tions[ope];
-      ans = ans(this.stack.pop(), this.value);
+      var ans = this.tions[ope](this.stack.pop(), this.value);
       console.log(ans);
       this.startOver = true;
       this.op = null;
@@ -105,8 +101,7 @@ function Calculator(display, max, spaces)  {
 }
 
 window.onload = function(){
-  var calc = new Calculator(document.getElementById('screen'), 20, 40);
-  
+  var calc = new Calculator(document.getElementById('screen'), 20);
   var reset = function(light){
     for (var item in rations){
       console.log(item);
@@ -151,7 +146,6 @@ window.onload = function(){
 
   for ( var i = 0; i < rands.length; i++ ) (function(i){ 
     rands[i].onclick = function() {
-      
       calc.screenWrite(i);
       calc.startOver = false;
     };
