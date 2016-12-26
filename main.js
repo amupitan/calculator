@@ -1,34 +1,34 @@
 "use strict";
 
-//basic setup
-const True = true;
-const False = false;
-
-function Stack(){
-  this.stk = [];
-  this.stk.length = 0;
-  this.size = function(){
+class Stack{
+  
+  constructor(){
+    this.stk = [];
+  }
+  size(){
     return this.stk.length;
-  };
+  }
   
-  this.push = function(val){
+  push(val){
     return this.stk.push(val);
-  };
+  }
   
-  this.pop = function(val){
+  pop(val){
     return this.stk.pop();
-  };
+  }
   
-  this.peek = function(){
+  peek(){
     return this.stk[this.size() - 1];
-  };
+  }
   
-  this.empty = function(){
+  empty(){
     this.stk.length = 0;
-  };
+  }
 }
 
-function Calculator(display, max)  {
+class Calculator  {
+  
+  constructor(display, max){
   this.screenDisplay = display;
   this.max = max;
   this.prev = '';
@@ -36,57 +36,43 @@ function Calculator(display, max)  {
   this.startOver = true;
   this.stack = new Stack();
   this.op = null;
-  
-  this.run = function(ope){
-    return this.tions[ope];
-  };
-  
   this.tions = {
-    'plus' : function(a, b){
-            return a/1.0 + b/1.0;
-            },
-    'min' : function(a, b){
-              return a - b;
-            },
-    'times' : function(a, b){
-                return a*b;
-              },
-  
-    'div' : function(a, b){
-              return a/b;
-            },
-  
-    'mod' : function(a, b){
-              return a%b;
-            },
+    'plus' : (a, b) => a/1.0 + b/1.0,
+    'times' : (a, b) => a*b,
+    'min' : (a, b) => a-b,
+    'div' : (a, b) => a/b,
+    'mod' : (a, b) => a%b,
   };
+  }
   
-  this.solve = function(ope){
+  run(ope){
+    return this.tions[ope];
+  }
+  
+  solve(ope){
     if (this.value !== '' && this.op !== null){
       if (ope === undefined) ope = this.op;
       let ans = this.tions[ope](this.stack.pop(), this.value);
-      console.log(ans);
       this.startOver = true;
       this.op = null;
       this.screenWrite(ans);
       this.stack.push(ans);
     }
-  };
+  }
   
-  this.operate = function(ope){
+  operate(ope){
     if (this.value === '&#8291;') this.value = '0';
     if (this.op === null || this.value === ''){
       this.stack.push(parseInt(this.value));
       this.prev = this.value;
       this.value = '';
-      console.log('ri');
     }
     else if (this.stack.size() === 1)
       this.solve();
     this.op = ope;
-  };
+  }
   
-  this.clear = function(doubleClick=false){
+  clear(doubleClick=false){
     this.prev = this.value;
     this.value = '&#8291;';
     this.screenWrite('&#8291;');
@@ -94,9 +80,9 @@ function Calculator(display, max)  {
       this.op = null;
       this.stack.empty();
     }
-  };
+  }
   
-  this.backspace = function(){
+  backspace(){
     if (this.op !== null){
       this.op = null;
       this.stack.empty();
@@ -111,9 +97,9 @@ function Calculator(display, max)  {
       this.screenWrite(newStr);
       this.stack.empty();
     }
-  };
+  }
   
-  this.screenWrite = function(val){
+  screenWrite(val){
     if (this.value === '&#8291;') this.value = '';
     console.log(this.value);
     if (val === '&#8291;') {
@@ -127,89 +113,55 @@ function Calculator(display, max)  {
     if (this.value.length < this.max)
       this.screenDisplay.innerHTML = this.value;
     
-  };
+  }
   
-  var makeSpaces = function(num){
-    var res = "";
-    for(var i = 0; i < num; i++){
-      res += " ";
-    }
-    return res;
-  };
 }
 
 window.onload = function(){
   var calc = new Calculator(document.getElementById('screen'), 20);
-  var reset = function(pressedKey){
-    for (var item in rations){
-      rations[item].className = "tap tion";
-    }
+  var reset = pressedKey => {
+    for (var item in rations) rations[item].className = "tap tion";
     if (pressedKey !== undefined)
       pressedKey.className += " light";
   };
-  var rands;
-  try{
-    rands = [].slice.call(document.getElementsByClassName('rand')).reverse();
-  } catch(e){ /*For IE8 and below*/
-    rands = [
-      document.getElementById('zero'),
-      document.getElementById('one'),
-      document.getElementById('two'),
-      document.getElementById('three'),
-      document.getElementById('four'),
-      document.getElementById('five'),
-      document.getElementById('six'),
-      document.getElementById('seven'),
-      document.getElementById('eight'),
-      document.getElementById('nine')
-    ];
-  }
+  var rands = [].slice.call(document.getElementsByClassName('rand')).reverse();
   
-  var rations = {
-      'plus' : document.getElementById('plus'), //TODO use this to simplify code
-      min : document.getElementById('min'),
-      times : document.getElementById('times'),
-      div : document.getElementById('div'),
-      mod : document.getElementById('mod'),
-      
-  };
+  var rations = {};
+  [].slice.call(document.getElementsByClassName('tion')).forEach(ele => {
+    rations[ele.id] = document.getElementById(ele.id);
+  });
   
+  var sys = {};
+  [].slice.call(document.getElementsByClassName('sys')).forEach(ele => {
+    sys[ele.id] = document.getElementById(ele.id);
+  });
   
-  var sys = {
-    back : document.getElementById('back'),
-    ans : document.getElementById('equ'),
-    clear : document.getElementById('clear'),
-  };
-  
-  sys.ans.onclick = function(){
+  sys.equ.onclick = () => {
     calc.solve();
     reset();
   };
   
-  sys.back.onclick = function(){
+  sys.back.onclick = () => {
     calc.backspace();
     reset();
   };
   
-  sys.clear.onclick = function(){
-    calc.clear();
-  };
+  sys.clear.onclick = () => calc.clear();
   
-  sys.clear.ondblclick = function(){
+  sys.clear.ondblclick = () => {
     calc.clear(true);
     reset();
   };
   
 
-  for ( var i = 0; i < rands.length; i++ ) (function(i){ 
+  for ( var i = 0; i < rands.length; i++ ) (i => { 
     rands[i].onclick = function() {
       calc.screenWrite(i);
       calc.startOver = false;
-      
     };
   })(i);
   
-  for (var operation in rations) (function(i){
+  for (var operation in rations) (i => {
     rations[operation].onclick = function(){
       calc.operate(this.id);
       calc.startOver = true;
@@ -221,7 +173,7 @@ window.onload = function(){
 
 /*TODO
 **Screen lenth optimization
-**optimize to ES6
+--optimize to ES6
 --Add backspace
 --Add clear
 **Add dot
